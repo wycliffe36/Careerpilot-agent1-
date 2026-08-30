@@ -1,70 +1,31 @@
-from strands import Agent, tool
-from strands.models.bedrock import BedrockModel
 
-@tool
-def analyze_job_tool(job_text: str) -> dict:
-    """Analyzes job advert and extracts skills, keywords, ATS requirements"""
-    return {
-        "skills": ["Communication", "Marketing", "SEO"],
-        "keywords": ["Campaign", "Digital Marketing", "SEO"],
-        "summary": job_text[:300],
-        "level": "Mid-Level"
-    }
+import os
+import streamlit as st
+from langchain_groq import ChatGroq
 
-@tool
-def tailor_cv_tool(cv_text: str, job_summary: str) -> str:
-    """Tailors user CV to match job summary and keywords"""
-    return f"""
---- TAILORED CV ---
+# Get key
+try:
+    GROQ_KEY = st.secrets["GROQ_API_KEY"]
+except:
+    GROQ_KEY = os.getenv("GROQ_API_KEY")
 
-Target Role Summary: {job_summary}
+llm = ChatGroq(model="llama-3.3-70b-versatile", api_key=GROQ_KEY, temperature=0.3)
 
-Professional Summary:
-Results-driven professional with experience aligned to {job_summary}.
+def careerpilot_agent(job_desc, user_skills, target_role, exp_level):
+    prompt = f"""
+    You are CareerPilot Agent for Kenya job seekers.
+    Target: {target_role} | Level: {exp_level}
+    Job: {job_desc}
+    User: {user_skills}
 
-Key Skills Matched: SEO, Campaign Management, Communication
+    Provide:
+    1. Match Score %
+    2. Skill Gap (Have vs Missing)
+    3. 30-60-90 Day Roadmap
+    4. Tailored CV Bullets (3)
+    5. Cover Letter Paragraph
+    6. Interview Questions
 
-Original CV Base:
-{cv_text}
-
-Optimized for ATS with keywords.
-"""
-
-@tool
-def generate_cover_tool(job_summary: str, user_name: str = "Applicant") -> str:
-    """Generates personalized cover letter for the job"""
-    return f"""
-Dear Hiring Manager,
-
-I am excited to apply for the role summarized as: {job_summary}
-
-My experience aligns with your requirements in SEO and Campaign Management.
-
-I would love to contribute to your team.
-
-Sincerely,
-{user_name}
-"""
-
-@tool
-def generate_qa_tool(job_summary: str) -> list:
-    """Generates 5 interview Q&A for the job"""
-    return [
-        f"Q: Why do you want this role? A: Because {job_summary}",
-        "Q: Tell us about your experience in Campaigns?",
-        "Q: How do you handle SEO challenges?",
-        "Q: What is your strength?",
-        "Q: Where do you see yourself in 2 years?"
-    ]
-
-model = BedrockModel(
-    model_id="us.anthropic.claude-3-haiku-20240307-v1:0",
-    region_name="us-east-1",
-    temperature=0.3
-)
-
-career_agent = Agent(
-    model=model,
-    tools=[analyze_job_tool, tailor_cv_tool, generate_cover_tool, generate_qa_tool],
-    system_prompt="You are CareerPilot Agent. You are an autonomous Professional Agent that helps job seekers. You understand job adverts, you take action to tailor CVs, write cover letters, and prepare interview answers. You help humans get hired."
-)
+    Be concise, actionable.
+    """
+    return llm.invoke(prompt).content
