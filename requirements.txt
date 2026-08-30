@@ -1,5 +1,7 @@
-strands-agents>=1.19.0
-strands-agents-tools>=0.2.17
-boto3
-python-dotenv
-streamlit
+
+streamlit==1.39.0
+langchain-groq==0.2.2
+langchain-core==0.3.33
+groq==0.11.0
+python-dotenv==1.0.1
+pypdf==4.3.1
