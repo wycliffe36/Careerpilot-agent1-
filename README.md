@@ -13,10 +13,9 @@ CareerPilot Agent is an autonomous agent that:
 3. Helps humans get hired faster
 
 ### Demo Video (2 min)
-[https://klydk6.streamlit.app]
-
-### Live Demo Link
 [https://youtube.com/shorts/vpNmv6qgE4w?si=jRpTPEYXao5fJWF4]
+
+### Live Demo [https://klydk6.streamlit.app]
 
 ### How to Run Locally
 pip install -r requirements.txt
